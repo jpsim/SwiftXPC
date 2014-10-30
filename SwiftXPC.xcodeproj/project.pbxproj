@@ -10,6 +10,8 @@
 		E8FE43FD1A01A8AF002672BD /* SwiftXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = E8FE43FC1A01A8AF002672BD /* SwiftXPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E8FE44031A01A8AF002672BD /* SwiftXPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FE43F71A01A8AF002672BD /* SwiftXPC.framework */; };
 		E8FE440A1A01A8AF002672BD /* SwiftXPCTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FE44091A01A8AF002672BD /* SwiftXPCTests.swift */; };
+		E8FE44141A01A8CC002672BD /* XPCType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FE44131A01A8CC002672BD /* XPCType.swift */; };
+		E8FE442A1A01AA08002672BD /* SwiftXPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FE44291A01AA08002672BD /* SwiftXPC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +31,8 @@
 		E8FE44021A01A8AF002672BD /* SwiftXPCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftXPCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8FE44081A01A8AF002672BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E8FE44091A01A8AF002672BD /* SwiftXPCTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftXPCTests.swift; sourceTree = "<group>"; };
+		E8FE44131A01A8CC002672BD /* XPCType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XPCType.swift; sourceTree = "<group>"; };
+		E8FE44291A01AA08002672BD /* SwiftXPC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftXPC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +76,8 @@
 			isa = PBXGroup;
 			children = (
 				E8FE43FC1A01A8AF002672BD /* SwiftXPC.h */,
+				E8FE44131A01A8CC002672BD /* XPCType.swift */,
+				E8FE44291A01AA08002672BD /* SwiftXPC.swift */,
 				E8FE43FA1A01A8AF002672BD /* Supporting Files */,
 			);
 			path = SwiftXPC;
@@ -209,6 +215,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8FE44141A01A8CC002672BD /* XPCType.swift in Sources */,
+				E8FE442A1A01AA08002672BD /* SwiftXPC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +323,7 @@
 		E8FE440E1A01A8AF002672BD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -326,12 +335,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		E8FE440F1A01A8AF002672BD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
