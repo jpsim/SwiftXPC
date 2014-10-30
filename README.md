@@ -5,7 +5,7 @@ XPC simplified for Swift. Deal with Swift and NS* objects instead of
 
 ## Credit
 
-This project started as a Swift port of @stevestreza's excellent
+This project started as a Swift port of [@stevestreza](https://twitter.com/stevestreza)'s excellent
 [XPCKit](https://github.com/stevestreza/XPCKit).
 
 ## License
