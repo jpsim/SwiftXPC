@@ -89,7 +89,14 @@ public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     case let lhs as Bool:
         return lhs == rhs as Bool
     case let lhs as NSFileHandle:
-        return lhs.isEqualTo(rhs as NSFileHandle)
+        let lhsFD = lhs.fileDescriptor
+        let rhsFD = (rhs as NSFileHandle).fileDescriptor
+        var lhsStat = stat(), rhsStat = stat()
+        if (fstat(lhsFD, &lhsStat) < 0 ||
+            fstat(rhsFD, &rhsStat) < 0) {
+            return false
+        }
+        return (lhsStat.st_dev == rhsStat.st_dev) && (lhsStat.st_ino == rhsStat.st_ino)
     default:
         // Should never happen because we've checked all XPCRepresentable types
         return false

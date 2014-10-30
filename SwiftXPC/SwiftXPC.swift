@@ -189,5 +189,5 @@ public func toXPC(fileHandle: NSFileHandle) -> xpc_object_t? {
 }
 
 public func fromXPC(xpcObject: xpc_object_t) -> NSFileHandle? {
-    return NSFileHandle(fileDescriptor: xpc_fd_dup(xpcObject))
+    return NSFileHandle(fileDescriptor: xpc_fd_dup(xpcObject), closeOnDealloc: true)
 }

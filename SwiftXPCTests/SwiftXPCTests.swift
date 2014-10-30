@@ -28,23 +28,6 @@ func testEqualityOfXPCRoundtrip(object: XPCRepresentable) {
 
 class SwiftXPCTests: XCTestCase {
 
-    func testOneWayDictionary() {
-        let xpcDict = xpc_dictionary_create(nil, nil, 0)
-        xpc_dictionary_set_value(xpcDict, "Array", xpc_array_create(nil, 0))
-        xpc_dictionary_set_value(xpcDict, "Dictionary", xpc_dictionary_create(nil, nil, 0))
-        xpc_dictionary_set_string(xpcDict, "String", "string")
-        xpc_dictionary_set_date(xpcDict, "Date", Int64(NSDate().timeIntervalSince1970) * 1000000000)
-        xpc_dictionary_set_data(xpcDict, "Data", nil, 0)
-        xpc_dictionary_set_uint64(xpcDict, "UInt64", 1)
-        xpc_dictionary_set_int64(xpcDict, "Int64", 1)
-        xpc_dictionary_set_double(xpcDict, "Double", 1)
-        xpc_dictionary_set_bool(xpcDict, "Bool", true)
-        xpc_dictionary_set_fd(xpcDict, "FileHandle", 0)
-        
-        let dict: XPCDictionary = fromXPC(xpcDict)
-        XCTAssertEqual(dict.count, 10, "XPCDictionary should have the same number of items as XPC dictionary")
-    }
-
     func testStrings() {
         testEqualityOfXPCRoundtrip("")
         testEqualityOfXPCRoundtrip("Hello world!")
@@ -78,7 +61,7 @@ class SwiftXPCTests: XCTestCase {
         testEqualityOfXPCRoundtrip([] as XPCArray)
 
         // Complete
-        // TODO: Test Array, Dictionary, FileHandle
+        // TODO: Test Array, Dictionary
         testEqualityOfXPCRoundtrip([
             "string",
             NSDate(),
@@ -86,7 +69,8 @@ class SwiftXPCTests: XCTestCase {
             UInt64(0),
             Int64(0),
             0.0,
-            false
+            false,
+            NSFileHandle(fileDescriptor: 0)
             ] as XPCArray)
     }
 
@@ -95,7 +79,7 @@ class SwiftXPCTests: XCTestCase {
         testEqualityOfXPCRoundtrip([:] as XPCDictionary)
 
         // Complete
-        // TODO: Test Array, Dictionary, FileHandle
+        // TODO: Test Array, Dictionary
         testEqualityOfXPCRoundtrip([
             "String": "string",
             "Date": NSDate(),
@@ -103,7 +87,8 @@ class SwiftXPCTests: XCTestCase {
             "UInt64": UInt64(0),
             "Int64": Int64(0),
             "Double": 0.0,
-            "Bool": false
+            "Bool": false,
+            "FileHandle": NSFileHandle(fileDescriptor: 0)
             ] as XPCDictionary)
     }
 }
