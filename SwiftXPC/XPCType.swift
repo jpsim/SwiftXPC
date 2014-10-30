@@ -10,8 +10,7 @@
 import Foundation
 import XPC
 
-// MARK: XPCRepresentable Protocol
-
+/// Protocol to group Swift/Objective-C types that can be represented as XPC types.
 public protocol XPCRepresentable {}
 extension Array: XPCRepresentable {}
 extension Dictionary: XPCRepresentable {}
@@ -25,14 +24,12 @@ extension Bool: XPCRepresentable {}
 extension NSFileHandle: XPCRepresentable {}
 extension CFBooleanRef: XPCRepresentable {}
 
-// MARK: XPCType Enum
-
+/// Possible XPC types
 public enum XPCType {
     case Array, Dictionary, String, Date, Data, UInt64, Int64, Double, Bool, FileHandle
 }
 
-// MARK: Map xpc_type_t to XPCType
-
+/// Map xpc_type_t (COpaquePointer's) to their appropriate XPCType enum value.
 let typeMap: [xpc_type_t: XPCType] = [
     // TODO: File radar to expose XPC_TYPE C-defines to Swift
     xpc_get_type(xpc_array_create(nil, 0)): .Array,
@@ -47,17 +44,19 @@ let typeMap: [xpc_type_t: XPCType] = [
     xpc_get_type(xpc_fd_create(0)): .FileHandle
 ]
 
-// MARK: Type Aliases
-
+/// Type alias to simplify referring to an Array of XPCRepresentable objects.
 public typealias XPCArray = [XPCRepresentable]
+/// Type alias to simplify referring to a Dictionary of XPCRepresentable objects with String keys.
 public typealias XPCDictionary = [String: XPCRepresentable]
 
 // MARK: Equatable
 
+/// Enable comparison of XPCRepresentable objects.
 public func !=(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     return !(lhs == rhs)
 }
 
+/// Enable comparison of XPCRepresentable objects.
 public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     switch lhs {
     case let lhs as XPCArray:
