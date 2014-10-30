@@ -6,4 +6,5 @@
 //  Copyright (c) 2014 JP Simard. All rights reserved.
 //
 
-// Required file
+// Required umbrella header file.
+// File intentionally left empty.
