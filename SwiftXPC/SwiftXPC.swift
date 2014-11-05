@@ -40,6 +40,8 @@ public func toXPCGeneral(object: XPCRepresentable) -> xpc_object_t? {
         return toXPC(object)
     case let object as NSFileHandle:
         return toXPC(object)
+    case let object as NSUUID:
+        return toXPC(object)
     default:
         // Should never happen because we've checked all XPCRepresentable types
         return nil
@@ -76,6 +78,8 @@ public func fromXPCGeneral(xpcObject: xpc_object_t) -> XPCRepresentable? {
         return fromXPC(xpcObject) as Bool!
     case .FileHandle:
         return fromXPC(xpcObject) as NSFileHandle!
+    case .Uuid:
+        return fromXPC(xpcObject) as NSUUID!
     }
 }
 
@@ -344,4 +348,28 @@ Converts an xpc_object_t file handle to an equivalent NSFileHandle.
 */
 public func fromXPC(xpcObject: xpc_object_t) -> NSFileHandle? {
     return NSFileHandle(fileDescriptor: xpc_fd_dup(xpcObject), closeOnDealloc: true)
+}
+
+/**
+Converts an NSUUI to an equivalent xpc_object_t uuid.
+
+:param: uuid NSUUID to convert.
+
+:returns: Converted XPC uuid. Equivalent but not necessarily identical to the input.
+*/
+public func toXPC(uuid: NSUUID) -> xpc_object_t? {
+    var bytes = [Byte](count: 16, repeatedValue: 0)
+    uuid.getUUIDBytes(&bytes)
+    return xpc_uuid_create(bytes)
+}
+
+/**
+Converts an xpc_object_t uuid to an equivalent NSUUID.
+
+:param: xpcObject XPC uuid to to convert.
+
+:returns: Converted NSUUID. Equivalent but not necessarily identical to the input.
+*/
+public func fromXPC(xpcObject: xpc_object_t) -> NSUUID? {
+    return NSUUID(UUIDBytes: xpc_uuid_get_bytes(xpcObject))
 }
