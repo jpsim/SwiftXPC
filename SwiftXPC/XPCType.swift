@@ -26,7 +26,7 @@ extension NSUUID: XPCRepresentable {}
 
 /// Possible XPC types
 public enum XPCType {
-    case Array, Dictionary, String, Date, Data, UInt64, Int64, Double, Bool, FileHandle, Uuid
+    case Array, Dictionary, String, Date, Data, UInt64, Int64, Double, Bool, FileHandle, UUID
 }
 
 /// Map xpc_type_t (COpaquePointer's) to their appropriate XPCType enum value.
@@ -42,7 +42,7 @@ let typeMap: [xpc_type_t: XPCType] = [
     xpc_get_type(xpc_double_create(0)): .Double,
     xpc_get_type(xpc_bool_create(true)): .Bool,
     xpc_get_type(xpc_fd_create(0)): .FileHandle,
-    xpc_get_type(xpc_uuid_create([Byte](count: 16, repeatedValue: 0))): .Uuid
+    xpc_get_type(xpc_uuid_create([Byte](count: 16, repeatedValue: 0))): .UUID
 ]
 
 /// Type alias to simplify referring to an Array of XPCRepresentable objects.

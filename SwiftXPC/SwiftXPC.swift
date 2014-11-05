@@ -78,7 +78,7 @@ public func fromXPCGeneral(xpcObject: xpc_object_t) -> XPCRepresentable? {
         return fromXPC(xpcObject) as Bool!
     case .FileHandle:
         return fromXPC(xpcObject) as NSFileHandle!
-    case .Uuid:
+    case .UUID:
         return fromXPC(xpcObject) as NSUUID!
     }
 }
