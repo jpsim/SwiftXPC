@@ -351,7 +351,7 @@ public func fromXPC(xpcObject: xpc_object_t) -> NSFileHandle? {
 }
 
 /**
-Converts an NSUUI to an equivalent xpc_object_t uuid.
+Converts an NSUUID to an equivalent xpc_object_t uuid.
 
 :param: uuid NSUUID to convert.
 
