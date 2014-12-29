@@ -5,7 +5,6 @@
 //  Created by JP Simard on 10/29/14.
 //  Copyright (c) 2014 JP Simard. All rights reserved.
 //
-// TODO: Support UUIDs
 
 import Foundation
 import XPC
@@ -23,10 +22,11 @@ extension Double: XPCRepresentable {}
 extension Bool: XPCRepresentable {}
 extension NSFileHandle: XPCRepresentable {}
 extension CFBooleanRef: XPCRepresentable {}
+extension NSUUID: XPCRepresentable {}
 
 /// Possible XPC types
 public enum XPCType {
-    case Array, Dictionary, String, Date, Data, UInt64, Int64, Double, Bool, FileHandle
+    case Array, Dictionary, String, Date, Data, UInt64, Int64, Double, Bool, FileHandle, UUID
 }
 
 /// Map xpc_type_t (COpaquePointer's) to their appropriate XPCType enum value.
@@ -41,7 +41,8 @@ let typeMap: [xpc_type_t: XPCType] = [
     xpc_get_type(xpc_int64_create(0)): .Int64,
     xpc_get_type(xpc_double_create(0)): .Double,
     xpc_get_type(xpc_bool_create(true)): .Bool,
-    xpc_get_type(xpc_fd_create(0)): .FileHandle
+    xpc_get_type(xpc_fd_create(0)): .FileHandle,
+    xpc_get_type(xpc_uuid_create([Byte](count: 16, repeatedValue: 0))): .UUID
 ]
 
 /// Type alias to simplify referring to an Array of XPCRepresentable objects.
@@ -96,6 +97,8 @@ public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
             return false
         }
         return (lhsStat.st_dev == rhsStat.st_dev) && (lhsStat.st_ino == rhsStat.st_ino)
+    case let lhs as NSUUID:
+        return lhs.isEqual(rhs as NSUUID)
     default:
         // Should never happen because we've checked all XPCRepresentable types
         return false

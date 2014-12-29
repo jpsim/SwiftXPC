@@ -74,6 +74,10 @@ class SwiftXPCTests: XCTestCase {
             ] as XPCArray)
     }
 
+    func testUuids() {
+        testEqualityOfXPCRoundtrip(NSUUID())
+    }
+
     func testDictionaries() {
         // Empty
         testEqualityOfXPCRoundtrip([:] as XPCDictionary)
@@ -88,7 +92,8 @@ class SwiftXPCTests: XCTestCase {
             "Int64": Int64(0),
             "Double": 0.0,
             "Bool": false,
-            "FileHandle": NSFileHandle(fileDescriptor: 0)
+            "FileHandle": NSFileHandle(fileDescriptor: 0),
+            "Uuid": NSUUID(UUIDBytes: [Byte](count: 16, repeatedValue: 0))
             ] as XPCDictionary)
     }
 }
