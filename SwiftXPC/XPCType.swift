@@ -31,7 +31,7 @@ public enum XPCType {
 
 /// Map xpc_type_t (COpaquePointer's) to their appropriate XPCType enum value.
 let typeMap: [xpc_type_t: XPCType] = [
-    // TODO: File radar to expose XPC_TYPE C-defines to Swift
+    // FIXME: Use xpc_type_t constants as keys once http://openradar.me/19776929 has been fixed.
     xpc_get_type(xpc_array_create(nil, 0)): .Array,
     xpc_get_type(xpc_dictionary_create(nil, nil, 0)): .Dictionary,
     xpc_get_type(xpc_string_create("")): .String,
@@ -42,7 +42,7 @@ let typeMap: [xpc_type_t: XPCType] = [
     xpc_get_type(xpc_double_create(0)): .Double,
     xpc_get_type(xpc_bool_create(true)): .Bool,
     xpc_get_type(xpc_fd_create(0)): .FileHandle,
-    xpc_get_type(xpc_uuid_create([Byte](count: 16, repeatedValue: 0))): .UUID
+    xpc_get_type(xpc_uuid_create([UInt8](count: 16, repeatedValue: 0))): .UUID
 ]
 
 /// Type alias to simplify referring to an Array of XPCRepresentable objects.
@@ -62,43 +62,55 @@ public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     switch lhs {
     case let lhs as XPCArray:
         for (idx, value) in enumerate(lhs) {
-            if (rhs as XPCArray)[idx] != value {
+            if (rhs as? XPCArray) == nil {
+                return false
+            }
+            if (rhs as! XPCArray)[idx] != value { // Safe to force cast
                 return false
             }
         }
         return true
     case let lhs as XPCDictionary:
         for (key, value) in lhs {
-            if (rhs as XPCDictionary)[key]! != value {
+            if (rhs as? XPCDictionary) == nil {
+                return false
+            }
+            if (rhs as! XPCDictionary)[key]! != value { // Safe to force cast
                 return false
             }
         }
         return true
     case let lhs as String:
-        return lhs == rhs as String
+        return lhs == rhs as? String
     case let lhs as NSDate:
-        return abs(lhs.timeIntervalSinceDate(rhs as NSDate)) < 0.000001
+        if (rhs as? NSDate) == nil {
+            return false
+        }
+        return abs(lhs.timeIntervalSinceDate(rhs as! NSDate)) < 0.000001 // Safe to force cast
     case let lhs as NSData:
-        return lhs.isEqualTo(rhs as NSData)
+        return lhs.isEqualTo(rhs as? NSData)
     case let lhs as UInt64:
-        return lhs == rhs as UInt64
+        return lhs == rhs as? UInt64
     case let lhs as Int64:
-        return lhs == rhs as Int64
+        return lhs == rhs as? Int64
     case let lhs as Double:
-        return lhs == rhs as Double
+        return lhs == rhs as? Double
     case let lhs as Bool:
-        return lhs == rhs as Bool
+        return lhs == rhs as? Bool
     case let lhs as NSFileHandle:
         let lhsFD = lhs.fileDescriptor
-        let rhsFD = (rhs as NSFileHandle).fileDescriptor
+        let rhsFD = (rhs as? NSFileHandle)?.fileDescriptor
+        if rhsFD == nil {
+            return false
+        }
         var lhsStat = stat(), rhsStat = stat()
         if (fstat(lhsFD, &lhsStat) < 0 ||
-            fstat(rhsFD, &rhsStat) < 0) {
+            fstat(rhsFD!, &rhsStat) < 0) { // Safe to force cast
             return false
         }
         return (lhsStat.st_dev == rhsStat.st_dev) && (lhsStat.st_ino == rhsStat.st_ino)
     case let lhs as NSUUID:
-        return lhs.isEqual(rhs as NSUUID)
+        return lhs.isEqual(rhs as? NSUUID)
     default:
         // Should never happen because we've checked all XPCRepresentable types
         return false

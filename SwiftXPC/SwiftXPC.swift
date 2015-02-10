@@ -95,7 +95,9 @@ Converts an Array of XPCRepresentable objects to its xpc_object_t value.
 public func toXPC(array: XPCArray) -> xpc_object_t {
     let xpcArray = xpc_array_create(nil, 0)
     for value in array {
-        xpc_array_append_value(xpcArray, toXPCGeneral(value))
+        if let xpcValue = toXPCGeneral(value) {
+            xpc_array_append_value(xpcArray, xpcValue)
+        }
     }
     return xpcArray
 }
@@ -358,7 +360,7 @@ Converts an NSUUID to an equivalent xpc_object_t uuid.
 :returns: Converted XPC uuid. Equivalent but not necessarily identical to the input.
 */
 public func toXPC(uuid: NSUUID) -> xpc_object_t? {
-    var bytes = [Byte](count: 16, repeatedValue: 0)
+    var bytes = [UInt8](count: 16, repeatedValue: 0)
     uuid.getUUIDBytes(&bytes)
     return xpc_uuid_create(bytes)
 }
