@@ -147,10 +147,8 @@ Converts an xpc_object_t dictionary to a Dictionary of XPCRepresentable objects.
 public func fromXPC(xpcObject: xpc_object_t) -> XPCDictionary {
     var dict = XPCDictionary()
     xpc_dictionary_apply(xpcObject) { key, value in
-        if let key = String(UTF8String: key) {
-            if let value = fromXPCGeneral(value) {
-                dict[key] = value
-            }
+        if let key = String(UTF8String: key), let value = fromXPCGeneral(value) {
+            dict[key] = value
         }
         return true
     }
@@ -218,7 +216,7 @@ Converts an NSData to an xpc_object_t data.
 :returns: Converted XPC data.
 */
 public func toXPC(data: NSData) -> xpc_object_t? {
-    return xpc_data_create(data.bytes, UInt(data.length))
+    return xpc_data_create(data.bytes, data.length)
 }
 
 /**
