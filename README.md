@@ -14,19 +14,21 @@ let swiftDict = [
   "Int64": Int64(0),
   "Double": 0.0,
   "Bool": false,
-  "FileHandle": NSFileHandle(fileDescriptor: 0)
+  "FileHandle": NSFileHandle(fileDescriptor: 0),
+  "Uuid": NSUUID(UUIDBytes: [Byte](count: 16, repeatedValue: 0))
 ]
 toXPC(swiftDict)
-// <OS_xpc_dictionary: <dictionary: 0x10031a680> { count = 8, contents =
-//   "Bool" => <bool: 0x7fff73904a58>: false
-//   "Date" => <date: 0x10031e180> Wed Oct 29 21:42:40 2014 PDT (approx)
-//   "Double" => <double: 0x10031ddf0>: 0.000000
-//   "String" => <string: 0x10031d850> { length = 6, contents = "string" }
-//   "Int64" => <int64: 0x10031e020>: 0
-//   "FileHandle" => <fd: 0x10031dff0> { type = (invalid descriptor), path = /dev/ttys003 }
-//   "UInt64" => <uint64: 0x10031dc10>: 0
-//   "Data" => <data: 0x10031dad0>: { length = 0 bytes, contents = (nil)
-// }>
+//<OS_xpc_dictionary: <dictionary: 0x100333580> { count = 9, contents =
+//    "Bool" => <bool: 0x7fff7bf7aa58>: false
+//    "Date" => <date: 0x1003337b0> Sun Mar 01 16:23:52 2015 PST (approx)
+//    "Uuid" => <uuid: 0x100333800> 00000000-0000-0000-0000-000000000000
+//    "Double" => <double: 0x1003336a0>: 0.000000
+//    "String" => <string: 0x1001705d0> { length = 6, contents = "string" }
+//    "Int64" => <int64: 0x100333780>: 0
+//    "FileHandle" => <fd: 0x1003301a0> { type = (invalid descriptor), path = /dev/ttys004 }
+//    "UInt64" => <uint64: 0x1003333a0>: 0
+//    "Data" => <data: 0x100333650>: { length = 0 bytes, contents = (nil)
+//}>
 ```
 
 ## Credit
