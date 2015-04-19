@@ -62,31 +62,27 @@ public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     switch lhs {
     case let lhs as XPCArray:
         for (idx, value) in enumerate(lhs) {
-            if (rhs as? XPCArray) == nil {
-                return false
+            if let rhs = rhs as? XPCArray where rhs[idx] == value {
+                continue
             }
-            if (rhs as! XPCArray)[idx] != value { // Safe to force cast
-                return false
-            }
+            return false
         }
         return true
     case let lhs as XPCDictionary:
         for (key, value) in lhs {
-            if (rhs as? XPCDictionary) == nil {
-                return false
+            if let rhs = rhs as? XPCDictionary,
+                rhsValue = rhs[key] where rhsValue == value {
+                continue
             }
-            if (rhs as! XPCDictionary)[key]! != value { // Safe to force cast
-                return false
-            }
+            return false
         }
         return true
     case let lhs as String:
         return lhs == rhs as? String
     case let lhs as NSDate:
-        if (rhs as? NSDate) == nil {
-            return false
-        }
-        return abs(lhs.timeIntervalSinceDate(rhs as! NSDate)) < 0.000001 // Safe to force cast
+        return map(rhs as? NSDate) { rhs in
+            return abs(lhs.timeIntervalSinceDate(rhs)) < 0.000001
+        } ?? false
     case let lhs as NSData:
         return lhs.isEqualTo(rhs as? NSData)
     case let lhs as UInt64:
@@ -98,17 +94,15 @@ public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     case let lhs as Bool:
         return lhs == rhs as? Bool
     case let lhs as NSFileHandle:
-        let lhsFD = lhs.fileDescriptor
-        let rhsFD = (rhs as? NSFileHandle)?.fileDescriptor
-        if rhsFD == nil {
-            return false
-        }
-        var lhsStat = stat(), rhsStat = stat()
-        if (fstat(lhsFD, &lhsStat) < 0 ||
-            fstat(rhsFD!, &rhsStat) < 0) { // Safe to force cast
-            return false
-        }
-        return (lhsStat.st_dev == rhsStat.st_dev) && (lhsStat.st_ino == rhsStat.st_ino)
+        return map((rhs as? NSFileHandle)?.fileDescriptor) { rhsFD in
+            let lhsFD = lhs.fileDescriptor
+            var lhsStat = stat(), rhsStat = stat()
+            if (fstat(lhsFD, &lhsStat) < 0 ||
+                fstat(rhsFD, &rhsStat) < 0) {
+                return false
+            }
+            return (lhsStat.st_dev == rhsStat.st_dev) && (lhsStat.st_ino == rhsStat.st_ino)
+        } ?? false
     case let lhs as NSUUID:
         return lhs.isEqual(rhs as? NSUUID)
     default:
