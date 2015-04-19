@@ -15,7 +15,7 @@ let swiftDict = [
   "Double": 0.0,
   "Bool": false,
   "FileHandle": NSFileHandle(fileDescriptor: 0),
-  "Uuid": NSUUID(UUIDBytes: [Byte](count: 16, repeatedValue: 0))
+  "Uuid": NSUUID(UUIDBytes: [UInt8](count: 16, repeatedValue: 0))
 ]
 toXPC(swiftDict)
 //<OS_xpc_dictionary: <dictionary: 0x100333580> { count = 9, contents =

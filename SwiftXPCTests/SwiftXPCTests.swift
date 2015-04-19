@@ -71,7 +71,7 @@ class SwiftXPCTests: XCTestCase {
             0.0,
             false,
             NSFileHandle(fileDescriptor: 0),
-            NSUUID(UUIDBytes: [Byte](count: 16, repeatedValue: 0))
+            NSUUID(UUIDBytes: [UInt8](count: 16, repeatedValue: 0))
             ] as XPCArray)
     }
 
@@ -90,7 +90,7 @@ class SwiftXPCTests: XCTestCase {
             "Double": 0.0,
             "Bool": false,
             "FileHandle": NSFileHandle(fileDescriptor: 0),
-            "Uuid": NSUUID(UUIDBytes: [Byte](count: 16, repeatedValue: 0))
+            "Uuid": NSUUID(UUIDBytes: [UInt8](count: 16, repeatedValue: 0))
             ] as XPCDictionary)
     }
 }
