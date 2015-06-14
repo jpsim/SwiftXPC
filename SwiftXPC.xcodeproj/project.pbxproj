@@ -164,6 +164,7 @@
 		E8FE43EE1A01A8AF002672BD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "JP Simard";
 				TargetAttributes = {
@@ -408,6 +409,7 @@
 				E8FE440F1A01A8AF002672BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E8FE44101A01A8AF002672BD /* Build configuration list for PBXNativeTarget "SwiftXPCTests" */ = {
 			isa = XCConfigurationList;
@@ -416,6 +418,7 @@
 				E8FE44121A01A8AF002672BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
