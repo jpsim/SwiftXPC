@@ -61,7 +61,7 @@ public func !=(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
 public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     switch lhs {
     case let lhs as XPCArray:
-        for (idx, value) in enumerate(lhs) {
+        for (idx, value) in lhs.enumerate() {
             if let rhs = rhs as? XPCArray where rhs[idx] == value {
                 continue
             }
@@ -80,7 +80,7 @@ public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     case let lhs as String:
         return lhs == rhs as? String
     case let lhs as NSDate:
-        return map(rhs as? NSDate) { rhs in
+        return (rhs as? NSDate).map { rhs in
             return abs(lhs.timeIntervalSinceDate(rhs)) < 0.000001
         } ?? false
     case let lhs as NSData:
@@ -94,7 +94,7 @@ public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     case let lhs as Bool:
         return lhs == rhs as? Bool
     case let lhs as NSFileHandle:
-        return map((rhs as? NSFileHandle)?.fileDescriptor) { rhsFD in
+        return ((rhs as? NSFileHandle)?.fileDescriptor).map { rhsFD in
             let lhsFD = lhs.fileDescriptor
             var lhsStat = stat(), rhsStat = stat()
             if (fstat(lhsFD, &lhsStat) < 0 ||
