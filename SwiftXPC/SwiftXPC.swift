@@ -145,7 +145,8 @@ Converts an xpc_object_t dictionary to a Dictionary of XPCRepresentable objects.
 - returns: Converted Dictionary of XPCRepresentable objects.
 */
 public func fromXPC(xpcObject: xpc_object_t) -> XPCDictionary {
-    var dict = XPCDictionary()
+    let count = xpc_dictionary_get_count(xpcObject)
+    var dict = XPCDictionary(minimumCapacity: count)
     xpc_dictionary_apply(xpcObject) { key, value in
         if let key = String(UTF8String: key), let value = fromXPCGeneral(value) {
             dict[key] = value
