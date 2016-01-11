@@ -93,13 +93,11 @@ Converts an Array of XPCRepresentable objects to its xpc_object_t value.
 - returns: Converted XPC array.
 */
 public func toXPC(array: XPCArray) -> xpc_object_t {
-    let xpcArray = xpc_array_create(nil, 0)
-    for value in array {
-        if let xpcValue = toXPCGeneral(value) {
-            xpc_array_append_value(xpcArray, xpcValue)
-        }
+    var xpcArray: xpc_object_t? = nil
+    array.map(toXPCGeneral).withUnsafeBufferPointer { buffer in
+        xpcArray = xpc_array_create(buffer.baseAddress, buffer.count)
     }
-    return xpcArray
+    return xpcArray ?? xpc_array_create(nil, 0)
 }
 
 /**
