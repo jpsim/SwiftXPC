@@ -10,7 +10,16 @@ import Foundation
 import XPC
 
 /// Protocol to group Swift/Objective-C types that can be represented as XPC types.
-public protocol XPCRepresentable {}
+public protocol XPCRepresentable {
+    func isEqualTo(rhs: XPCRepresentable) -> Bool
+}
+
+extension XPCRepresentable {
+    public func isEqualTo(rhs: XPCRepresentable) -> Bool {
+        return self == rhs
+    }
+}
+
 extension Array: XPCRepresentable {}
 extension Dictionary: XPCRepresentable {}
 extension String: XPCRepresentable {}
@@ -53,12 +62,12 @@ public typealias XPCDictionary = [String: XPCRepresentable]
 // MARK: Equatable
 
 /// Enable comparison of XPCRepresentable objects.
-public func !=(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
+internal func !=(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     return !(lhs == rhs)
 }
 
 /// Enable comparison of XPCRepresentable objects.
-public func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
+internal func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
     switch lhs {
     case let lhs as XPCArray:
         for (idx, value) in lhs.enumerate() {
