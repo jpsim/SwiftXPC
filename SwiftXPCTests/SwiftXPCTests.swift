@@ -23,7 +23,7 @@ func testEqualityOfXPCRoundtrip(object: XPCRepresentable) {
         XCTFail("XPC-converted object is nil")
     }
 
-    XCTAssertTrue(object == outObject!, "Object \(object) was not equal to result \(outObject)")
+    XCTAssertTrue(object.isEqualTo(outObject!), "Object \(object) was not equal to result \(outObject)")
 }
 
 class SwiftXPCTests: XCTestCase {
