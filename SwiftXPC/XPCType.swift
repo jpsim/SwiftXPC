@@ -14,12 +14,6 @@ public protocol XPCRepresentable {
     func isEqualTo(rhs: XPCRepresentable) -> Bool
 }
 
-extension XPCRepresentable {
-    public func isEqualTo(rhs: XPCRepresentable) -> Bool {
-        return self == rhs
-    }
-}
-
 extension Array: XPCRepresentable {}
 extension Dictionary: XPCRepresentable {}
 extension String: XPCRepresentable {}
@@ -59,63 +53,58 @@ public typealias XPCArray = [XPCRepresentable]
 /// Type alias to simplify referring to a Dictionary of XPCRepresentable objects with String keys.
 public typealias XPCDictionary = [String: XPCRepresentable]
 
-// MARK: Equatable
-
 /// Enable comparison of XPCRepresentable objects.
-internal func !=(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
-    return !(lhs == rhs)
-}
-
-/// Enable comparison of XPCRepresentable objects.
-internal func ==(lhs: XPCRepresentable, rhs: XPCRepresentable) -> Bool {
-    switch lhs {
-    case let lhs as XPCArray:
-        for (idx, value) in lhs.enumerate() {
-            if let rhs = rhs as? XPCArray where rhs[idx] == value {
-                continue
-            }
-            return false
-        }
-        return true
-    case let lhs as XPCDictionary:
-        for (key, value) in lhs {
-            if let rhs = rhs as? XPCDictionary,
-                rhsValue = rhs[key] where rhsValue == value {
-                continue
-            }
-            return false
-        }
-        return true
-    case let lhs as String:
-        return lhs == rhs as? String
-    case let lhs as NSDate:
-        return (rhs as? NSDate).map { rhs in
-            return abs(lhs.timeIntervalSinceDate(rhs)) < 0.000001
-        } ?? false
-    case let lhs as NSData:
-        return lhs.isEqualTo(rhs as? NSData)
-    case let lhs as UInt64:
-        return lhs == rhs as? UInt64
-    case let lhs as Int64:
-        return lhs == rhs as? Int64
-    case let lhs as Double:
-        return lhs == rhs as? Double
-    case let lhs as Bool:
-        return lhs == rhs as? Bool
-    case let lhs as NSFileHandle:
-        return ((rhs as? NSFileHandle)?.fileDescriptor).map { rhsFD in
-            let lhsFD = lhs.fileDescriptor
-            var lhsStat = stat(), rhsStat = stat()
-            if (fstat(lhsFD, &lhsStat) < 0 ||
-                fstat(rhsFD, &rhsStat) < 0) {
+extension XPCRepresentable {
+    public func isEqualTo(rhs: XPCRepresentable) -> Bool {
+        switch self {
+        case let lhs as XPCArray:
+            for (idx, value) in lhs.enumerate() {
+                if let rhs = rhs as? XPCArray where rhs[idx].isEqualTo(value) {
+                    continue
+                }
                 return false
             }
-            return (lhsStat.st_dev == rhsStat.st_dev) && (lhsStat.st_ino == rhsStat.st_ino)
-        } ?? false
-    case let lhs as NSUUID:
-        return lhs.isEqual(rhs as? NSUUID)
-    default:
-        // Should never happen because we've checked all XPCRepresentable types
-        return false
+            return true
+        case let lhs as XPCDictionary:
+            for (key, value) in lhs {
+                if let rhs = rhs as? XPCDictionary,
+                    rhsValue = rhs[key] where rhsValue.isEqualTo(value) {
+                        continue
+                }
+                return false
+            }
+            return true
+        case let lhs as String:
+            return lhs == rhs as? String
+        case let lhs as NSDate:
+            return (rhs as? NSDate).map { rhs in
+                return abs(lhs.timeIntervalSinceDate(rhs)) < 0.000001
+                } ?? false
+        case let lhs as NSData:
+            return lhs.isEqualTo(rhs as? NSData)
+        case let lhs as UInt64:
+            return lhs == rhs as? UInt64
+        case let lhs as Int64:
+            return lhs == rhs as? Int64
+        case let lhs as Double:
+            return lhs == rhs as? Double
+        case let lhs as Bool:
+            return lhs == rhs as? Bool
+        case let lhs as NSFileHandle:
+            return ((rhs as? NSFileHandle)?.fileDescriptor).map { rhsFD in
+                let lhsFD = lhs.fileDescriptor
+                var lhsStat = stat(), rhsStat = stat()
+                if (fstat(lhsFD, &lhsStat) < 0 ||
+                    fstat(rhsFD, &rhsStat) < 0) {
+                        return false
+                }
+                return (lhsStat.st_dev == rhsStat.st_dev) && (lhsStat.st_ino == rhsStat.st_ino)
+                } ?? false
+        case let lhs as NSUUID:
+            return lhs.isEqual(rhs as? NSUUID)
+        default:
+            // Should never happen because we've checked all XPCRepresentable types
+            return false
+        }
     }
 }
