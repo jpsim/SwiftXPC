@@ -44,7 +44,7 @@ let typeMap: [xpc_type_t: XPCType] = [
     xpc_get_type(xpc_int64_create(0)): .Int64,
     xpc_get_type(xpc_double_create(0)): .Double,
     xpc_get_type(xpc_bool_create(true)): .Bool,
-    xpc_get_type(xpc_fd_create(0)): .FileHandle,
+    xpc_get_type(xpc_fd_create(0)!): .FileHandle,
     xpc_get_type(xpc_uuid_create([UInt8](count: 16, repeatedValue: 0))): .UUID
 ]
 
