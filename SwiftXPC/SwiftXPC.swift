@@ -18,33 +18,32 @@ Converts an XPCRepresentable object to its xpc_object_t value.
 
 - returns: Converted XPC object.
 */
-public func toXPCGeneral(object: XPCRepresentable) -> xpc_object_t? {
+public func toXPCGeneral(_ object: XPCRepresentable) -> xpc_object_t {
     switch object {
     case let object as XPCArray:
         return toXPC(object)
     case let object as XPCDictionary:
         return toXPC(object)
     case let object as String:
-        return toXPC(object)
-    case let object as NSDate:
-        return toXPC(object)
-    case let object as NSData:
-        return toXPC(object)
+        return toXPC(object)!
+    case let object as Date:
+        return toXPC(object)!
+    case let object as Data:
+        return toXPC(object)!
     case let object as UInt64:
-        return toXPC(object)
+        return toXPC(object)!
     case let object as Int64:
-        return toXPC(object)
+        return toXPC(object)!
     case let object as Double:
-        return toXPC(object)
+        return toXPC(object)!
     case let object as Bool:
-        return toXPC(object)
-    case let object as NSFileHandle:
-        return toXPC(object)
-    case let object as NSUUID:
-        return toXPC(object)
+        return toXPC(object)!
+    case let object as FileHandle:
+        return toXPC(object)!
+    case let object as UUID:
+        return toXPC(object)!
     default:
-        // Should never happen because we've checked all XPCRepresentable types
-        return nil
+        fatalError("Should never happen because we've checked all XPCRepresentable types")
     }
 }
 
@@ -55,31 +54,31 @@ Converts an xpc_object_t to its Swift value (XPCRepresentable).
 
 - returns: Converted XPCRepresentable object.
 */
-public func fromXPCGeneral(xpcObject: xpc_object_t) -> XPCRepresentable? {
+public func fromXPCGeneral(_ xpcObject: xpc_object_t) -> XPCRepresentable? {
     let type = xpc_get_type(xpcObject)
     switch typeMap[type]! {
-    case .Array:
+    case .array:
         return fromXPC(xpcObject) as XPCArray
-    case .Dictionary:
+    case .dictionary:
         return fromXPC(xpcObject) as XPCDictionary
-    case .String:
+    case .string:
         return fromXPC(xpcObject) as String!
-    case .Date:
-        return fromXPC(xpcObject) as NSDate!
-    case .Data:
-        return fromXPC(xpcObject) as NSData!
-    case .UInt64:
+    case .date:
+        return fromXPC(xpcObject) as Date!
+    case .data:
+        return fromXPC(xpcObject) as Data!
+    case .uInt64:
         return fromXPC(xpcObject) as UInt64!
-    case .Int64:
+    case .int64:
         return fromXPC(xpcObject) as Int64!
-    case .Double:
+    case .double:
         return fromXPC(xpcObject) as Double!
-    case .Bool:
+    case .bool:
         return fromXPC(xpcObject) as Bool!
-    case .FileHandle:
-        return fromXPC(xpcObject) as NSFileHandle!
-    case .UUID:
-        return fromXPC(xpcObject) as NSUUID!
+    case .fileHandle:
+        return fromXPC(xpcObject) as FileHandle!
+    case .uuid:
+        return fromXPC(xpcObject) as UUID!
     }
 }
 
@@ -92,12 +91,10 @@ Converts an Array of XPCRepresentable objects to its xpc_object_t value.
 
 - returns: Converted XPC array.
 */
-public func toXPC(array: XPCArray) -> xpc_object_t {
-    var xpcArray: xpc_object_t? = nil
-    array.map(toXPCGeneral).withUnsafeBufferPointer { buffer in
-        xpcArray = xpc_array_create(buffer.baseAddress, buffer.count)
+public func toXPC(_ array: XPCArray) -> xpc_object_t {
+    return array.map(toXPCGeneral).withUnsafeBufferPointer { buffer in
+        return xpc_array_create(buffer.baseAddress, buffer.count)
     }
-    return xpcArray ?? xpc_array_create(nil, 0)
 }
 
 /**
@@ -107,11 +104,11 @@ Converts an xpc_object_t array to an Array of XPCRepresentable objects.
 
 - returns: Converted Array of XPCRepresentable objects.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> XPCArray {
+public func fromXPC(_ xpcObject: xpc_object_t) -> XPCArray {
     var array = XPCArray()
     xpc_array_apply(xpcObject) { index, value in
         if let value = fromXPCGeneral(value) {
-            array.insert(value, atIndex: Int(index))
+            array.insert(value, at: Int(index))
         }
         return true
     }
@@ -127,7 +124,7 @@ Converts a Dictionary of XPCRepresentable objects to its xpc_object_t value.
 
 - returns: Converted XPC dictionary.
 */
-public func toXPC(dictionary: XPCDictionary) -> xpc_object_t {
+public func toXPC(_ dictionary: XPCDictionary) -> xpc_object_t {
     let xpcDictionary = xpc_dictionary_create(nil, nil, 0)
     for (key, value) in dictionary {
         xpc_dictionary_set_value(xpcDictionary, key, toXPCGeneral(value))
@@ -142,11 +139,11 @@ Converts an xpc_object_t dictionary to a Dictionary of XPCRepresentable objects.
 
 - returns: Converted Dictionary of XPCRepresentable objects.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> XPCDictionary {
+public func fromXPC(_ xpcObject: xpc_object_t) -> XPCDictionary {
     let count = xpc_dictionary_get_count(xpcObject)
     var dict = XPCDictionary(minimumCapacity: count)
     xpc_dictionary_apply(xpcObject) { key, value in
-        if let key = String(UTF8String: key), let value = fromXPCGeneral(value) {
+        if let key = String(validatingUTF8: key), let value = fromXPCGeneral(value) {
             dict[key] = value
         }
         return true
@@ -163,7 +160,7 @@ Converts a String to an xpc_object_t string.
 
 - returns: Converted XPC string.
 */
-public func toXPC(string: String) -> xpc_object_t? {
+public func toXPC(_ string: String) -> xpc_object_t? {
     return xpc_string_create(string)
 }
 
@@ -174,13 +171,13 @@ Converts an xpc_object_t string to a String.
 
 - returns: Converted String.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> String? {
-    return String(UTF8String: xpc_string_get_string_ptr(xpcObject))
+public func fromXPC(_ xpcObject: xpc_object_t) -> String? {
+    return String(validatingUTF8: xpc_string_get_string_ptr(xpcObject)!)
 }
 
 // MARK: Date
 
-private let xpcDateInterval: NSTimeInterval = 1000000000
+private let xpcDateInterval: TimeInterval = 1000000000
 
 /**
 Converts an NSDate to an xpc_object_t date.
@@ -189,7 +186,7 @@ Converts an NSDate to an xpc_object_t date.
 
 - returns: Converted XPC date.
 */
-public func toXPC(date: NSDate) -> xpc_object_t? {
+public func toXPC(_ date: Date) -> xpc_object_t? {
     return xpc_date_create(Int64(date.timeIntervalSince1970 * xpcDateInterval))
 }
 
@@ -200,9 +197,9 @@ Converts an xpc_object_t date to an NSDate.
 
 - returns: Converted NSDate.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> NSDate? {
+public func fromXPC(_ xpcObject: xpc_object_t) -> Date? {
     let nanosecondsInterval = xpc_date_get_value(xpcObject)
-    return NSDate(timeIntervalSince1970: NSTimeInterval(nanosecondsInterval) / xpcDateInterval)
+    return Date(timeIntervalSince1970: TimeInterval(nanosecondsInterval) / xpcDateInterval)
 }
 
 // MARK: Data
@@ -214,8 +211,8 @@ Converts an NSData to an xpc_object_t data.
 
 - returns: Converted XPC data.
 */
-public func toXPC(data: NSData) -> xpc_object_t? {
-    return xpc_data_create(data.bytes, data.length)
+public func toXPC(_ data: Data) -> xpc_object_t? {
+    return xpc_data_create((data as NSData).bytes, data.count)
 }
 
 /**
@@ -225,8 +222,11 @@ Converts an xpc_object_t data to an NSData.
 
 - returns: Converted NSData.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> NSData? {
-    return NSData(bytes: xpc_data_get_bytes_ptr(xpcObject), length: Int(xpc_data_get_length(xpcObject)))
+public func fromXPC(_ xpcObject: xpc_object_t) -> Data? {
+    if let ptr = xpc_data_get_bytes_ptr(xpcObject) {
+        return Data(bytes: ptr, count: Int(xpc_data_get_length(xpcObject)))
+    }
+    return nil
 }
 
 // MARK: UInt64
@@ -238,7 +238,7 @@ Converts a UInt64 to an xpc_object_t uint64.
 
 - returns: Converted XPC uint64.
 */
-public func toXPC(number: UInt64) -> xpc_object_t? {
+public func toXPC(_ number: UInt64) -> xpc_object_t? {
     return xpc_uint64_create(number)
 }
 
@@ -249,7 +249,7 @@ Converts an xpc_object_t uint64 to a UInt64.
 
 - returns: Converted UInt64.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> UInt64? {
+public func fromXPC(_ xpcObject: xpc_object_t) -> UInt64? {
     return xpc_uint64_get_value(xpcObject)
 }
 
@@ -262,7 +262,7 @@ Converts an Int64 to an xpc_object_t int64.
 
 - returns: Converted XPC int64.
 */
-public func toXPC(number: Int64) -> xpc_object_t? {
+public func toXPC(_ number: Int64) -> xpc_object_t? {
     return xpc_int64_create(number)
 }
 
@@ -273,7 +273,7 @@ Converts an xpc_object_t int64 to a Int64.
 
 - returns: Converted Int64.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> Int64? {
+public func fromXPC(_ xpcObject: xpc_object_t) -> Int64? {
     return xpc_int64_get_value(xpcObject)
 }
 
@@ -286,7 +286,7 @@ Converts a Double to an xpc_object_t double.
 
 - returns: Converted XPC double.
 */
-public func toXPC(number: Double) -> xpc_object_t? {
+public func toXPC(_ number: Double) -> xpc_object_t? {
     return xpc_double_create(number)
 }
 
@@ -297,7 +297,7 @@ Converts an xpc_object_t double to a Double.
 
 - returns: Converted Double.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> Double? {
+public func fromXPC(_ xpcObject: xpc_object_t) -> Double? {
     return xpc_double_get_value(xpcObject)
 }
 
@@ -310,7 +310,7 @@ Converts a Bool to an xpc_object_t bool.
 
 - returns: Converted XPC bool.
 */
-public func toXPC(bool: Bool) -> xpc_object_t? {
+public func toXPC(_ bool: Bool) -> xpc_object_t? {
     return xpc_bool_create(bool)
 }
 
@@ -321,7 +321,7 @@ Converts an xpc_object_t bool to a Bool.
 
 - returns: Converted Bool.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> Bool? {
+public func fromXPC(_ xpcObject: xpc_object_t) -> Bool? {
     return xpc_bool_get_value(xpcObject)
 }
 
@@ -334,7 +334,7 @@ Converts an NSFileHandle to an equivalent xpc_object_t file handle.
 
 - returns: Converted XPC file handle. Equivalent but not necessarily identical to the input.
 */
-public func toXPC(fileHandle: NSFileHandle) -> xpc_object_t? {
+public func toXPC(_ fileHandle: FileHandle) -> xpc_object_t? {
     return xpc_fd_create(fileHandle.fileDescriptor)
 }
 
@@ -345,8 +345,8 @@ Converts an xpc_object_t file handle to an equivalent NSFileHandle.
 
 - returns: Converted NSFileHandle. Equivalent but not necessarily identical to the input.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> NSFileHandle? {
-    return NSFileHandle(fileDescriptor: xpc_fd_dup(xpcObject), closeOnDealloc: true)
+public func fromXPC(_ xpcObject: xpc_object_t) -> FileHandle? {
+    return FileHandle(fileDescriptor: xpc_fd_dup(xpcObject), closeOnDealloc: true)
 }
 
 /**
@@ -356,9 +356,9 @@ Converts an NSUUID to an equivalent xpc_object_t uuid.
 
 - returns: Converted XPC uuid. Equivalent but not necessarily identical to the input.
 */
-public func toXPC(uuid: NSUUID) -> xpc_object_t? {
-    var bytes = [UInt8](count: 16, repeatedValue: 0)
-    uuid.getUUIDBytes(&bytes)
+public func toXPC(_ uuid: UUID) -> xpc_object_t? {
+    var bytes = [UInt8](repeating: 0, count: 16)
+    (uuid as NSUUID).getBytes(&bytes)
     return xpc_uuid_create(bytes)
 }
 
@@ -369,6 +369,6 @@ Converts an xpc_object_t uuid to an equivalent NSUUID.
 
 - returns: Converted NSUUID. Equivalent but not necessarily identical to the input.
 */
-public func fromXPC(xpcObject: xpc_object_t) -> NSUUID? {
-    return NSUUID(UUIDBytes: xpc_uuid_get_bytes(xpcObject))
+public func fromXPC(_ xpcObject: xpc_object_t) -> UUID? {
+    return (NSUUID(uuidBytes: xpc_uuid_get_bytes(xpcObject)!) as UUID)
 }

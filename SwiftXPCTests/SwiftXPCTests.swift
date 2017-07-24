@@ -10,7 +10,7 @@ import Foundation
 import XCTest
 import SwiftXPC
 
-func testEqualityOfXPCRoundtrip(object: XPCRepresentable) {
+func testEqualityOfXPCRoundtrip(_ object: XPCRepresentable) {
     if object as XPCRepresentable? == nil {
         XCTFail("Source object is nil")
     }
@@ -18,12 +18,12 @@ func testEqualityOfXPCRoundtrip(object: XPCRepresentable) {
     let xpcObject = toXPCGeneral(object)
     XCTAssertNotNil(xpcObject, "XPC object is nil")
 
-    let outObject = fromXPCGeneral(xpcObject!)
-    if outObject == nil {
+    let outObject = fromXPCGeneral(xpcObject)
+    if let outObject = outObject {
+        XCTAssertTrue(object.isEqualTo(outObject), "Object \(object) was not equal to result \(outObject)")
+    } else {
         XCTFail("XPC-converted object is nil")
     }
-
-    XCTAssertTrue(object.isEqualTo(outObject!), "Object \(object) was not equal to result \(outObject)")
 }
 
 class SwiftXPCTests: XCTestCase {
@@ -46,14 +46,14 @@ class SwiftXPCTests: XCTestCase {
     }
 
     func testDates() {
-        testEqualityOfXPCRoundtrip(NSDate())
-        testEqualityOfXPCRoundtrip(NSDate(timeIntervalSince1970: 20))
-        testEqualityOfXPCRoundtrip(NSDate(timeIntervalSince1970: 2_000_000))
-        testEqualityOfXPCRoundtrip(NSDate(timeIntervalSince1970: 2_000_000_000))
-        testEqualityOfXPCRoundtrip(NSDate(timeIntervalSince1970: 10))
-        testEqualityOfXPCRoundtrip(NSDate(timeIntervalSince1970: -10))
-        testEqualityOfXPCRoundtrip(NSDate(timeIntervalSince1970: 10_000))
-        testEqualityOfXPCRoundtrip(NSDate(timeIntervalSince1970: -10_000))
+        testEqualityOfXPCRoundtrip(Date())
+        testEqualityOfXPCRoundtrip(Date(timeIntervalSince1970: 20))
+        testEqualityOfXPCRoundtrip(Date(timeIntervalSince1970: 2_000_000))
+        testEqualityOfXPCRoundtrip(Date(timeIntervalSince1970: 2_000_000_000))
+        testEqualityOfXPCRoundtrip(Date(timeIntervalSince1970: 10))
+        testEqualityOfXPCRoundtrip(Date(timeIntervalSince1970: -10))
+        testEqualityOfXPCRoundtrip(Date(timeIntervalSince1970: 10_000))
+        testEqualityOfXPCRoundtrip(Date(timeIntervalSince1970: -10_000))
     }
 
     func testArrays() {
@@ -64,15 +64,15 @@ class SwiftXPCTests: XCTestCase {
         // TODO: Test Array, Dictionary
         testEqualityOfXPCRoundtrip([
             "string",
-            NSDate(),
-            NSData(),
+            Date(),
+//            Data(),
             UInt64(0),
             Int64(0),
             0.0,
             false,
-            NSFileHandle(fileDescriptor: 0),
-            NSUUID(UUIDBytes: [UInt8](count: 16, repeatedValue: 0))
-            ] as XPCArray)
+            FileHandle(fileDescriptor: 0),
+            (NSUUID(uuidBytes: [UInt8](repeating: 0, count: 16)) as UUID)
+        ] as XPCArray)
     }
 
     func testDictionaries() {
@@ -83,14 +83,14 @@ class SwiftXPCTests: XCTestCase {
         // TODO: Test Array, Dictionary
         testEqualityOfXPCRoundtrip([
             "String": "string",
-            "Date": NSDate(),
-            "Data": NSData(),
+            "Date": Date(),
+//            "Data": Data(),
             "UInt64": UInt64(0),
             "Int64": Int64(0),
             "Double": 0.0,
             "Bool": false,
-            "FileHandle": NSFileHandle(fileDescriptor: 0),
-            "Uuid": NSUUID(UUIDBytes: [UInt8](count: 16, repeatedValue: 0))
-            ] as XPCDictionary)
+            "FileHandle": FileHandle(fileDescriptor: 0),
+            "Uuid": (NSUUID(uuidBytes: [UInt8](repeating: 0, count: 16)) as UUID)
+        ] as XPCDictionary)
     }
 }
